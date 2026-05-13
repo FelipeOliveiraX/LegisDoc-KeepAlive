@@ -4,8 +4,8 @@ on:
   schedule:
     # Horário de Brasília (UTC-3): 06h às 22h
     # Horário UTC: 09h às 01h (do dia seguinte)
-    # Executa a cada 14 minutos para evitar que o Render entre em hibernação (limite de 15m)
-    - cron: '*/14 9-23,0-1 * * *'
+    # Executa a cada 10 minutos para evitar que o Render entre em hibernação (limite de 15m)
+    - cron: '*/10 9-23,0-1 * * *'
   workflow_dispatch: # Permite que você execute manualmente no GitHub para testar
 
 jobs:
@@ -15,11 +15,12 @@ jobs:
     steps:
       - name: Enviando Ping para o Render
         run: |
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://legisdoc.onrender.com/)
+          echo "Executando ping em $(date -u)"
+          STATUS=$(curl --max-time 10 -s -o /dev/null -w "%{http_code}" https://legisdoc.onrender.com/)
           echo "------------------------------------------------"
           echo "URL: https://legisdoc.onrender.com/"
           echo "Status de Retorno: $STATUS"
-          echo "Horário (UTC): $(date)"
+          echo "Horário (UTC): $(date -u)"
           echo "------------------------------------------------"
           
           if [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 400 ]; then
