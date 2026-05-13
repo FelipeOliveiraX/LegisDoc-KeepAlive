@@ -2,10 +2,10 @@ name: LegisDoc Keep Alive
 
 on:
   schedule:
-    # Horário de Brasília (UTC-3): 06h às 22h
-    # Horário UTC: 09h às 01h (do dia seguinte)
+    # Horário de Brasília (UTC-3): 03h às 02h do dia seguinte
+    # Horário UTC: 06h às 05h do dia seguinte
     # Executa a cada 10 minutos para evitar que o Render entre em hibernação (limite de 15m)
-    - cron: '*/10 9-23,0-1 * * *'
+    - cron: '*/10 * * * *'
   workflow_dispatch: # Permite que você execute manualmente no GitHub para testar
 
 jobs:
@@ -16,7 +16,7 @@ jobs:
       - name: Enviando Ping para o Render
         run: |
           echo "Executando ping em $(date -u)"
-          STATUS=$(curl --max-time 10 -s -o /dev/null -w "%{http_code}" https://legisdoc.onrender.com/)
+          STATUS=$(curl --max-time 10 -L -s -o /dev/null -w "%{http_code}" https://legisdoc.onrender.com/)
           echo "------------------------------------------------"
           echo "URL: https://legisdoc.onrender.com/"
           echo "Status de Retorno: $STATUS"
