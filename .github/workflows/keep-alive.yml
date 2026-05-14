@@ -16,7 +16,7 @@ jobs:
       - name: Enviando Ping para o Render
         run: |
           echo "Executando ping em $(date -u)"
-          STATUS=$(curl --max-time 10 -L -s -o /dev/null -w "%{http_code}" https://legisdoc.onrender.com/)
+          STATUS=$(curl --max-time 30 --connect-timeout 15 -L -s -o /dev/null -w "%{http_code}" https://legisdoc.onrender.com/)
           echo "------------------------------------------------"
           echo "URL: https://legisdoc.onrender.com/"
           echo "Status de Retorno: $STATUS"
@@ -25,6 +25,11 @@ jobs:
           
           if [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 400 ]; then
             echo "✅ Sucesso: O Backend está acordado!"
+          elif [ "$STATUS" = "000" ]; then
+            echo "⚠️ Timeout ou erro de conexão. Tentando novamente em 15s..."
+            sleep 15
+            STATUS=$(curl --max-time 30 -L -s -o /dev/null -w "%{http_code}" https://legisdoc.onrender.com/)
+            echo "Tentativa 2 - Status: $STATUS"
           else
             echo "ℹ️ O status $STATUS foi recebido. Mesmo se for erro, a requisição externa costuma ser o suficiente para o Render iniciar o boot."
           fi
